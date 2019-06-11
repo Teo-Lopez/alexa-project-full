@@ -11,9 +11,7 @@ router.post('/player/modify/:name', (req, res) => {
 })
 
 router.post('/player/new', (req, res) => {
-  
-  console.log("datos del post", {...req.body})
-  Player.create({...req.body.player})
+  Player.create([req.body])
   .then(player => player)
   .catch(err => console.log(err))
   
@@ -22,6 +20,9 @@ router.post('/player/new', (req, res) => {
 
 router.get('/player/:name', (req, res, next) =>  {
     console.log("entra", req.params.name)
+
+
+
     Player.findOne({nombre: req.params.name}) 
     .then(player => {
       console.log(player)
