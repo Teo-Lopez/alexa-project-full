@@ -73,9 +73,11 @@ const lookAroundIntentHandler = {
         switch(player.ubication) {
             case "cubiculo":
                 
-                if(cubicle.phone) {speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560437094/alexa-voices/cubiculoLocation.mp3_fvkysg.mp3"/>`  
+                if(cubicle.phone) {speechText = `<audio src='soundbank://soundlibrary/office/amzn_sfx_copy_machine_01'/>
+<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560437094/alexa-voices/cubiculoLocation.mp3_fvkysg.mp3"/>`  
                 } else {
-                    speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560439487/alexa-voices/cubicleNoPhone_xxgafh.mp3"/>`
+                    speechText = `<audio src='soundbank://soundlibrary/office/amzn_sfx_copy_machine_01'/>
+<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560439487/alexa-voices/cubicleNoPhone_xxgafh.mp3"/>`
                 }
                 
             break
@@ -96,7 +98,12 @@ const inventoryIntentHandler = {
     },
     handle(handlerInput) {
         let speechText = 'Tienes en tu posesión: '
-        player.inventory.length>0 ? player.inventory.forEach(elm => speechText += elm) : speechText = "No llevas nada encima." 
+        if(Object.keys(player).length === 0){
+            speechText = "No llevas nada encima."
+        } else { 
+            player.inventory.phone ? speechText += 'tu teléfono móvil, no tienes mensajes nuevos' : null
+            
+        }
 
 
         return handlerInput.responseBuilder
@@ -110,8 +117,10 @@ const inventoryIntentHandler = {
 
 // ----------------------------------------------BUSQUEDA O CREACION DE USER -----------------------------------------------------------------------------
 
-const setNameHandler = {                
+const setNameHandler = {  
+    
     canHandle(handlerInput) {
+        console.log(handlerInput.requestEnvelope.request)
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'setNameIntent';
             },
@@ -134,7 +143,7 @@ const setNameHandler = {
                 return handlerInput.responseBuilder
                     .speak(speechText) 
                     .reprompt()
-                    .addDelegateDirective("setCharacterIntent")
+               //     .addDelegateDirective("setCharacterIntent")
                     .getResponse()
                //     .reprompt('add a reprompt if you want to keep the session open for the user to respond')
                  
@@ -177,11 +186,12 @@ const setCharacterHandler = {
         player.lastIntent = 'startAdventureIntent'
         services.createPlayer(player)
 
-        let speechText = `Bienvenido ${player.character.nombre}. Cuando quieras saber dónde te encuentras di: "alrededor", si quieres saber que llevas encima, di: "inventario", te sugeriremos posibles opciones en cada interacción. ¿Entendido?`        
-        
+        let speechText = `Bienvenido ${player.character.nombre}. Cuando quieras saber dónde te encuentras di: "alrededor", si quieres saber que llevas encima, di: "inventario", te sugeriremos posibles opciones en cada interacción.`        
+        const updatedIntent = "startAdventureIntent"
+
         return handlerInput.responseBuilder
             .speak(speechText)
-            .addDelegateDirective(player.lastIntent)
+            .addDelegateDirective(updatedIntent)
             .getResponse();
     }
 };
@@ -221,6 +231,7 @@ const setCharacterClassHandler = {
 
 const startAdventureIntentHandler = {
     canHandle(handlerInput) {
+        console.log(handlerInput.requestEnvelope.request)
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'startAdventureIntent'
             && player.stage == 0;
@@ -228,18 +239,20 @@ const startAdventureIntentHandler = {
     
     
     handle(handlerInput) {
-        const speechText = `<audio src='https://res.cloudinary.com/ambdev/video/upload/v1560423646/alexa-voices/welcome_mmwkt8.mp3'/> <break time="1s"/> Yo soy B; A; I; La gran inteligencia artificial que gobierna está ciudad. Sé que no me recuerdas, pero te he hablado con anterioridad... varias veces. Digamos que hemos llegado a un acuerdo. A partir de ahora te enviaré instrucciones de que hacer a continuación, y <emphasis level="strong">tu... has decidido ayudarme</emphasis>.`;
+        const speechText = `<audio src='https://res.cloudinary.com/ambdev/video/upload/v1560423646/alexa-voices/welcome_mmwkt8.mp3'/> <break time="1s"/> Yo soy B; A; I; La gran inteligencia artificial que gobierna está ciudad. Sé que no me recuerdas, pero te he hablado con anterioridad... varias veces. Digamos que hemos llegado a un acuerdo. A partir de ahora te enviaré instrucciones de que hacer a continuación, y <emphasis>tu... has decidido ayudarme</emphasis>.`;
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt()
-            .addDelegateDirective("cubicleIntent")
-            .getResponse();
+            .getResponse()
     }
+    
 };
 
 
 const cubicleIntentHandler = {
     canHandle(handlerInput) {
+        console.log(player)
+        console.log(handlerInput.requestEnvelope.request)
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'cubicleIntent'
             && player.ubication==="cubiculo";
@@ -251,9 +264,10 @@ const cubicleIntentHandler = {
             player.stage = 0.1
         }
         
+        if(handlerInput.requestEnvelope.request.intent.slots.item.value) {
         switch(handlerInput.requestEnvelope.request.intent.slots.item.value) {
             case "móvil":
-                player.inventory.push("tu teléfono móvil")
+                player.inventory.phone = true
                 cubicle.phone = false
                 speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560441646/alexa-voices/phoneTaking_vp4spr.mp3" />`
                 break;
@@ -263,7 +277,7 @@ const cubicleIntentHandler = {
                 
         } 
 
-        
+        }
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt()
@@ -361,8 +375,8 @@ exports.handler = Alexa.SkillBuilders.custom()
         introIntentHandler,
         inventoryIntentHandler,
         lookAroundIntentHandler,
-        cubicleIntentHandler,
         startAdventureIntentHandler,
+        cubicleIntentHandler,
 //        setCharacterClassHandler,
         setCharacterHandler,
         setNameHandler,
