@@ -6,16 +6,11 @@ class Player{
   constructor() {
       this.nombre= "",
       this.stage= 0,
+      this.location= "cubiculo"
       this.character= {
-          nombre: "",
-          clase: "",
-          nivel: 1,
-          fuerza: randomCharacteristic(),
-          inteligencia: randomCharacteristic(),
-          destreza: randomCharacteristic(),
-          constitucion: randomCharacteristic(),
-          carisma: randomCharacteristic(),
+          nombre: ""
       }
+      this.inventario= {}
   }
 }
   

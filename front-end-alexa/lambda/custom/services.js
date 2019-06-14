@@ -9,16 +9,17 @@ class Services{
           .then( response => response.data)
           .catch()
     }
-
+    
     updatePlayer(player) {
-        axios.post(`https://new-adventure.herokuapp.com/api/player/modify/${playerName}`, player)
+        axios.post(`https://new-adventure.herokuapp.com/api/player/modify/${player.nombre}`, player)
           .then(response => response.data)
           .catch(err => console.log(err))
     }
-
+    
+    
     createPlayer(player) {
       axios.post(`https://new-adventure.herokuapp.com/api/player/new`, player)
-        .then(player => player)
+        .then(response => response.data)
         .catch(err => console.log(err))
     }
 }

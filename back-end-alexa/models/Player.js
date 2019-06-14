@@ -3,17 +3,13 @@ const Schema = mongoose.Schema;
 
 const playerSchema = new Schema({
     nombre: {type: String, unique: true},
-    stage: String,
+    stage: Number,
+    lastIntent: String,
+    ubication: String,
+    inventario: [],
     character: {
-      nombre: String,
-      clase: String,
-      nivel: Number,
-      fuerza: Number,
-      inteligencia: Number,
-      destreza: Number,
-      constitucion: Number,
-      carisma: Number
-    },
+      nombre: String
+    }
 }, {
     timestamps: true
   });

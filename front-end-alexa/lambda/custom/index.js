@@ -11,6 +11,10 @@ const services = new Services()
 
 let player
 
+const cubicle = {
+    phone: true
+}
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
@@ -27,19 +31,21 @@ const LaunchRequestHandler = {
 
 // ---------------------------------------------------------INTENTS GENERALES ----------------------------------------------------------------
 
+/*
 const showStatusHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'showStatusIntent';
             },
     handle(handlerInput) {
-        const speechText = `Tu personaje es un ${player.character.clase} y sus caracteristicas son fuerza: ${player.character.fuerza} puntos; inteligencia: ${player.character.inteligencia} puntos; destreza: ${player.character.destreza} puntos; constitucion: ${player.character.constitucion} puntos; y carisma: ${player.character.carisma} puntos`
+        const speechText = `Tu personaje es un ${player.nombre} `
         return handlerInput.responseBuilder
             .speak(speechText)
-            .getResponse();
+            .reprompt()
+            .getResponse()
     }
 };
-
+*/
 
 const introIntentHandler = {
     canHandle(handlerInput) {
@@ -50,9 +56,56 @@ const introIntentHandler = {
         const speechText = `Año 2132, vives en la ciudad de Nueva Nueva York, trabajas en el Grand Central Bank cómo técnico de soporte. La rutina es agradable y el trabajo no trae demasiadas sorpresas. Hasta que B; A; I;, la inteligencia artificial que se encuentra a cargo de la ciudad, conecta contigo a través de tú implante neuronal estandar. Escuchas lo que te propone, sorprendido piensas sobre si aceptar o no, parece una locura y no sabes si serás capaz de conseguirlo. Decides aceptar y BAI borra de tu memoria superficial todo rastro de la información confidencial que te ha transmitido...`
         return handlerInput.responseBuilder
             .speak(speechText)
+            .addDelegateDirective(player.lastIntent)
+            .reprompt()
             .getResponse();
     }
 };
+
+
+const lookAroundIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'lookAroundIntent';
+    },
+    handle(handlerInput) {
+        let speechText = ''
+        switch(player.ubication) {
+            case "cubiculo":
+                
+                if(cubicle.phone) {speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560437094/alexa-voices/cubiculoLocation.mp3_fvkysg.mp3"/>`  
+                } else {
+                    speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560439487/alexa-voices/cubicleNoPhone_xxgafh.mp3"/>`
+                }
+                
+            break
+        }
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+
+const inventoryIntentHandler = {
+    canHandle(handlerInput) {
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'inventoryIntent';
+    },
+    handle(handlerInput) {
+        let speechText = 'Tienes en tu posesión: '
+        player.inventory.length>0 ? player.inventory.forEach(elm => speechText += elm) : speechText = "No llevas nada encima." 
+
+
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt()
+            .getResponse();
+    }
+};
+
 
 
 // ----------------------------------------------BUSQUEDA O CREACION DE USER -----------------------------------------------------------------------------
@@ -77,15 +130,11 @@ const setNameHandler = {
                 
                     
                 speechText = `Hola ${player.nombre}, para comenzar esta aventura tienes que crear un personaje. ¿Cómo se llamará tú personaje?`
-                console.log(
-                    handlerInput.responseBuilder
-                    .getResponse()
-                    , "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-                
+              
                 return handlerInput.responseBuilder
                     .speak(speechText) 
-               //     .addDelegateDirective("setCharacterClassIntent")
                     .reprompt()
+                    .addDelegateDirective("setCharacterIntent")
                     .getResponse()
                //     .reprompt('add a reprompt if you want to keep the session open for the user to respond')
                  
@@ -101,9 +150,8 @@ const setNameHandler = {
                     .speak(speechText) 
                     .addDelegateDirective(player.lastIntent)
                     .reprompt()
-                    //.addDelegateDirective("setCharacterClassIntent")
-                    //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
                     .getResponse();        
+                    //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
                 
              }
         
@@ -126,16 +174,19 @@ const setCharacterHandler = {
     handle(handlerInput) {
         const nombreCharacter = handlerInput.requestEnvelope.request.intent.slots.nombrePersonaje.value
         player.character.nombre = nombreCharacter
-        const speechText = `¿Dirías que eres más fuerte o más inteligente?`
+        player.lastIntent = 'startAdventureIntent'
+        services.createPlayer(player)
+
+        let speechText = `Bienvenido ${player.character.nombre}. Cuando quieras saber dónde te encuentras di: "alrededor", si quieres saber que llevas encima, di: "inventario", te sugeriremos posibles opciones en cada interacción. ¿Entendido?`        
+        
         return handlerInput.responseBuilder
             .speak(speechText)
-            .reprompt()
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .addDelegateDirective(player.lastIntent)
             .getResponse();
     }
 };
 
-
+/*
 
 const setCharacterClassHandler = {
     canHandle(handlerInput) {
@@ -162,7 +213,7 @@ const setCharacterClassHandler = {
     }
 };
 
-
+*/
 // -------------------------------------------------FIN CREACION DE PERSONAJE -----------------------------------------------------------------------------------
 
 // -------------------------------------------------        STAGE   1         -----------------------------------------------------------------------------------
@@ -172,33 +223,54 @@ const startAdventureIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
             && handlerInput.requestEnvelope.request.intent.name === 'startAdventureIntent'
-            && player.stage === 0;
+            && player.stage == 0;
     },
+    
+    
     handle(handlerInput) {
-        const speechText = 'Yo soy B; A; I; La gran inteligencia artificial que gobierna está ciudad. Podrás escuchar mi voz durante la misión que se te ha sido asignada.';
+        const speechText = `<audio src='https://res.cloudinary.com/ambdev/video/upload/v1560423646/alexa-voices/welcome_mmwkt8.mp3'/> <break time="1s"/> Yo soy B; A; I; La gran inteligencia artificial que gobierna está ciudad. Sé que no me recuerdas, pero te he hablado con anterioridad... varias veces. Digamos que hemos llegado a un acuerdo. A partir de ahora te enviaré instrucciones de que hacer a continuación, y <emphasis level="strong">tu... has decidido ayudarme</emphasis>.`;
         return handlerInput.responseBuilder
             .speak(speechText)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .reprompt()
+            .addDelegateDirective("cubicleIntent")
             .getResponse();
     }
 };
 
 
-
-
-const HelloWorldIntentHandler = {
+const cubicleIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
-            && handlerInput.requestEnvelope.request.intent.name === 'HelloWorldIntent';
+            && handlerInput.requestEnvelope.request.intent.name === 'cubicleIntent'
+            && player.ubication==="cubiculo";
     },
     handle(handlerInput) {
-        const speechText = 'Hello World!';
+        let speechText = ''
+        if(player.stage== 0) {
+            speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560438180/alexa-voices/cubicleStart_kexaiz.mp3" />`
+            player.stage = 0.1
+        }
+        
+        switch(handlerInput.requestEnvelope.request.intent.slots.item.value) {
+            case "móvil":
+                player.inventory.push("tu teléfono móvil")
+                cubicle.phone = false
+                speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560441646/alexa-voices/phoneTaking_vp4spr.mp3" />`
+                break;
+            case "documentos":
+                speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560440199/alexa-voices/cubicleDocuments_j8ve4m.mp3" />`
+                break
+                
+        } 
+
+        
         return handlerInput.responseBuilder
             .speak(speechText)
-            //.reprompt('add a reprompt if you want to keep the session open for the user to respond')
+            .reprompt()
             .getResponse();
     }
 };
+
 const HelpIntentHandler = {
     canHandle(handlerInput) {
         return handlerInput.requestEnvelope.request.type === 'IntentRequest'
@@ -287,12 +359,14 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         introIntentHandler,
+        inventoryIntentHandler,
+        lookAroundIntentHandler,
+        cubicleIntentHandler,
         startAdventureIntentHandler,
-        setCharacterClassHandler,
+//        setCharacterClassHandler,
         setCharacterHandler,
         setNameHandler,
-        showStatusHandler,
-        HelloWorldIntentHandler,
+//        showStatusHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         SessionEndedRequestHandler,
