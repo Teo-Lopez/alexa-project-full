@@ -191,6 +191,13 @@
                         }
                     ],
                     "samples": [
+                        "me dirijo a el {place}",
+                        "me dirijo a la {place}",
+                        "me dirijo a los {place}",
+                        "me dirijo al {place}",
+                        "voy a el {place}",
+                        "vuelvo a mi {place}",
+                        "voy a mi {place}",
                         "vuelvo a la {place}",
                         "voy a la {place}",
                         "vuelvo a los {place}",
@@ -198,6 +205,11 @@
                         "vuelvo al {place}",
                         "voy al {place}"
                     ]
+                },
+                {
+                    "name": "securityRoomIntent",
+                    "slots": [],
+                    "samples": []
                 }
             ],
             "types": [
@@ -464,9 +476,9 @@
                         },
                         {
                             "name": {
-                                "value": "esperar",
+                                "value": "espero",
                                 "synonyms": [
-                                    "espero"
+                                    "esperar"
                                 ]
                             }
                         },
@@ -489,6 +501,15 @@
                 {
                     "name": "Place",
                     "values": [
+                        {
+                            "name": {
+                                "value": "sala de seguridad",
+                                "synonyms": [
+                                    "sala de camaras",
+                                    "sala de vigilancia"
+                                ]
+                            }
+                        },
                         {
                             "name": {
                                 "value": "toilet",

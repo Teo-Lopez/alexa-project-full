@@ -10,14 +10,28 @@ const Services = require("./services")
 const services = new Services()
 
 let player
+const reset =() => {
+      
+      player.stage= 0,
+      player.ubication= "cubiculo"
+      player.lastIntent ="introIntent"
+      player.inventory= {phone: false, card: false}
+      
+  }
+
 
 const cubicle = {
     phone: true
 }
 
+const toilet = {
+    card: true
+}
+
 const places = {
     toilet: ['toilet', 'baño', 'aseos', 'servicio'],
-    cubicle: ['cubiculo', 'cubículo', 'oficina', 'mi cubiculo', 'mi cubículo']
+    cubicle: ['cubiculo', 'cubículo', 'oficina', 'mi cubiculo', 'mi cubículo', 'mi oficina'],
+    securityRoom: ['sala de cámaras', 'sala de seguridad', 'sala de vigilancia']
 }
 
 const LaunchRequestHandler = {
@@ -61,7 +75,7 @@ const introIntentHandler = {
         const speechText = `Año 2132, vives en la ciudad de Nueva Nueva York, trabajas en el Grand Central Bank cómo técnico de soporte. La rutina es agradable y el trabajo no trae demasiadas sorpresas. Hasta que B; A; I;, la inteligencia artificial que se encuentra a cargo de la ciudad, conecta contigo a través de tú implante neuronal estandar. Escuchas lo que te propone, sorprendido piensas sobre si aceptar o no, parece una locura y no sabes si serás capaz de conseguirlo. Decides aceptar y BAI borra de tu memoria superficial todo rastro de la información confidencial que te ha transmitido...`
         return handlerInput.responseBuilder
             .speak(speechText)
-//            .addDelegateDirective(player.lastIntent)
+            .addDelegateDirective(player.lastIntent)
             .reprompt()
             .getResponse();
     }
@@ -87,8 +101,12 @@ const lookAroundIntentHandler = {
                 
                 break
             case "toilet":
-                if(player.stage===0.2){
+                if(player.stage===0.2 && !player.inventory.card){
                     speechText = `Narrador: Te encuentras en los baños. Sobre el lavabo están la tarjeta del guarda y su teléfono. Oyes al guarda de seguridad dentro del aseo, no tardará mucho en salir.`
+                } else if (player.stage === 0.2 && player.inventory.card){
+                    speechText = `Narrador: Te encuentras en los baños. Sobre el lavabo está su teléfono. Oyes al guarda de seguridad dentro del aseo, no tardará mucho en salir.`
+                } else if (player.stage >=0.4) {
+                    speechText = `Estás en los aseos. Desde aquí puedes volver a tu cubiculo.`
                 }
         }
 
@@ -116,6 +134,9 @@ const directioningIntentHandler = {
                 console.log("pues me voy al cubicle")
                 updatedIntent = "cubicleIntent"
 
+        } else if(places.securityRoom.includes(handlerInput.requestEnvelope.request.intent.slots.place.value)){
+                console.log("pues me voy a la sala de vigilancia")
+                updatedIntent = "securityRoomIntent"
         }
 
 
@@ -135,11 +156,11 @@ const inventoryIntentHandler = {
     },
     handle(handlerInput) {
         let speechText = 'Tienes en tu posesión: '
-        if(Object.keys(player).length === 0){
+        if(Object.keys(player.inventory).length === 0){
             speechText = "No llevas nada encima."
         } else { 
             player.inventory.phone ? speechText += 'tu teléfono móvil, no tienes mensajes nuevos' : null
-            
+            player.inventory.card ? speechText += 'la tarjeta de seguridad que le has robado al guarda, con ella puedes acceder a la sala de vigilancia' : null
         }
 
 
@@ -286,6 +307,7 @@ const startAdventureIntentHandler = {
     
 };
 
+//------------------------- CUBICULO
 
 const cubicleIntentHandler = {
     canHandle(handlerInput) {
@@ -296,18 +318,34 @@ const cubicleIntentHandler = {
             && (player.ubication=== "cubiculo" || player.ubication === "toilet");
     },
     handle(handlerInput) {
+        player.ubication = "cubiculo"
+        player.lastIntent = 'cubicleIntent'
+        
         let speechText
         if(player.stage== 0) {
             speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560438180/alexa-voices/cubicleStart_kexaiz.mp3" />`
             player.stage = 0.1
         }
         
+        
+        if(player.stage>=0.2){
+            speechText= `Narrador: Vuelves a tu cubículo en la zona de oficinas.`
+        
+            if(player.inventory.card){
+                speechText += `Alexa: Bien ya tenemos un modo de acceder a la sala de vigilancia. Necesitamos desactivar las cámaras y hacer sonar la alarma de incendios. Lo estás haciendo muy bien, continua así...`
+            }
+        }
+        
         if(handlerInput.requestEnvelope.request.intent.slots.item.value) {
             switch(handlerInput.requestEnvelope.request.intent.slots.item.value) {
                 case "móvil":
+                    if(cubicle.phone===true){
                     player.inventory.phone = true
                     cubicle.phone = false
-                    speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560441646/alexa-voices/phoneTaking_vp4spr.mp3" />`
+                    speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560441646/alexa-voices/phoneTaking_vp4spr.mp3" />`}
+                    else {
+                        speechText = `Narrador: Ya cogiste el móvil.`
+                    }
                     break;
                 case "documentos":
                     speechText = `<audio src="https://res.cloudinary.com/ambdev/video/upload/v1560440199/alexa-voices/cubicleDocuments_j8ve4m.mp3" />`
@@ -315,7 +353,7 @@ const cubicleIntentHandler = {
                 
             } 
         }
-        
+        services.updatePlayer(player)   //autoguardado
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt()
@@ -336,7 +374,10 @@ const toiletHandler = {
     handle(handlerInput) {
         let speechText = ""
         player.ubication = "toilet"
+        player.lastIntent = 'toiletIntent'
         console.log("estoy en toiletInent")
+        
+        
         
         if(player.stage == 0.1) {       // Primera vez que entra.
             player.stage = 0.2
@@ -346,9 +387,9 @@ const toiletHandler = {
            
             player.stage = 0.3
             
-            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "tarjeta"){    //Player roba la tarjeta.
+            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "tarjeta"&&toilet.card){    //Player roba la tarjeta.
                     console.log(player)
-
+                toilet.card = false
                 player.inventory.card = true
                 speechText = `¡Perfecto! Ahora rápido sal de aquí. Vuelve a tu cubículo!`
             } 
@@ -356,7 +397,7 @@ const toiletHandler = {
              
                 speechText = `Narrador: Decides lavarte la cara, intentando deshacerte de la voz que susurra en tu cabeza. Alexa: ¡Idiota! ¿Qué estás haciendo?`
             }
-            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "esperar") {//Espera
+            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "espero") {//Espera
                 speechText = `Alexa: Demonios, no te quedes ahí parado.`
             }
             if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "retrete") {//Se esconde en el retrete
@@ -365,30 +406,37 @@ const toiletHandler = {
             
         } else if (player.stage == 0.3) { 
             player.stage = 0.4
-            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "esperar" && player.inventory.card)  { //Espera y guarda sale, se da cuenta.
-                speechText = `Narrador: Te quedas de pie en el baño, sin saber que hacer. El guarda sale y te ve con la tarjeta en la mano. Tras una breve discusión tienes que acompañarle al cuarto de seguridad. Cuando les cuentas que estás oyendo voces a través de tu implante deciden investigar el asunto con cirujía invasiva. Alexa: Este es el final para ti.`
+            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "espero" && player.inventory.card)  { //Espera y guarda sale, se da cuenta.
+                speechText = `Narrador: Te quedas de pie en el baño, sin saber que hacer. El guarda sale y te ve con la tarjeta en la mano. Tras una breve discusión tienes que acompañarle al cuarto de seguridad. Cuando les cuentas que estás oyendo voces a través de tu implante deciden investigar el asunto con cirugía invasiva. Alexa: Este es el final para ti.`
+                
+                reset()
+                services.updatePlayer(player)
             }
-            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "esperar" && !player.inventory.card) {// Espera, guarda sale. Pierde oportunidad.
-            
+            if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "espero" && !player.inventory.card) {// Espera, guarda sale. Pierde oportunidad.
+                speechText = `Narrador: Te quedas de pie en el baño, sin saber que hacer. El guarda sale, recoge sus cosas y se marcha. Alexa: ¡Idiota! Has perdido una oportunidad de oro. Ahora tendremos que hacerlo de otra forma. Vuelve a tu oficina de momento.`
             }
             if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "retrete" && player.inventory.card) {//Se esconde, guarda sale y se va.
-            
+                speechText = `Narrador: Te escondes en uno de los retretes y esperas a que salga el guarda. Oyes como recoge su móvil, se lava las manos y sale del baño. Parece que no se ha dado cuenta. Alexa: Estupendo, vuelve a tu oficina de momento.`
             }
             if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "retrete" && !player.inventory.card) {//Se esconde, guarda sale y se va. Pierde oportunidad.
-            
+                speechText = `Narrador: Nervioso, te escondes en uno de los urinarios. Oyes como el guarda recoge sus cosas y sale del baño. ¡Idiota! Has perdido una oportunidad de oro. Ahora tendremos que hacerlo de otra forma. Vuelve a tu oficina de momento.`
             }
             if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "cara" && player.inventory.card) {//Espera, guarda sale. se da cuenta.
-            
+                speechText = `Narrador: Te lavas la cara e intentas disimular. El guarda sale y se da cuenta de que alguien ha cogido la tarjeta. Tras una breve discusión tienes que acompañarle al cuarto de seguridad. Cuando les cuentas que estás oyendo voces a través de tu implante deciden investigar el asunto con cirugía invasiva. Alexa: Este es el final para ti.`
+                
+                reset()
+                services.updatePlayer(player)
             }
             if(handlerInput.requestEnvelope.request.intent.slots.toiletAction.value == "cara" && !player.inventory.card) {//Espera, guarda sale. Pierde oportunidad.
-            
+                speechText = `Narrador: Angustiado te vuelves a echar agua en la cara con la esperanza de que la voz se marche. Mientras tanto el guarda sale, recoge sus cosas y se marcha. Alexa: No me voy a ir a ninguna parte. Más vale que empieces a obedecerme, por tu propio bien. Vuelve a tu oficina.`
             }
          
-        } else {
-            speechText = "entra en el else"
+        } else if(player.stage >= 0.4) {
+            speechText = "Entras al baño."
         }
         
         
+        services.updatePlayer(player)
         return handlerInput.responseBuilder
             .speak(speechText)
             .reprompt()
@@ -396,6 +444,42 @@ const toiletHandler = {
     }
     
 } 
+
+const securityRoomHandler =  {
+    canHandle(handlerInput) {
+        console.log("estoy en securityRoom")
+        console.log(handlerInput.requestEnvelope.request)
+        return handlerInput.requestEnvelope.request.type === 'IntentRequest'
+            && handlerInput.requestEnvelope.request.intent.name === 'securityRoomIntent'
+            && player.ubication=== "cubiculo";
+    },
+    handle(handlerInput) {
+        
+        
+        
+        
+        let speechText
+       
+       if(!player.inventory.card){
+           speechText = `Narrador: La sala de cámaras es de acceso restringido. No dispones de la identificación para entrar.`
+       } else if (player.inventory.card) {
+            player.ubication = "securityRoom"
+            player.lastIntent = 'securityRoomIntent'
+           speechText = `Narrador: Entras a hurtadillas en la sala de vigilancia. Desde aquí se gestionan todas las cámaras y bloqueos automáticos de seguridad del banco. Alexa: Ahora necesitamos que desactives las cámaras de vigilancia `
+       } else if (handlerInput.requestEnvelope.request.intent.slots.secRoomAction==="desactivo las cámaras" && player.ubication==="securityRoom") {
+           player.stage = 1
+           player.ubication = "securityRoom"
+            player.lastIntent = 'securityRoomIntent'
+           speechText = `Narrador: Desactivas las cámaras de vigilancias como te pide la voz. No tienes muy claro porque la obedeces. Quizá todo tenga un motivo. Encuentras relajante delegar tus decisiones por una vez.`
+       }
+        services.updatePlayer(player)   //autoguardado
+        return handlerInput.responseBuilder
+            .speak(speechText)
+            .reprompt()
+            .getResponse();
+    }
+}; 
+
 
 const HelpIntentHandler = {
     canHandle(handlerInput) {
@@ -492,6 +576,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         startAdventureIntentHandler,
         cubicleIntentHandler,
         toiletHandler,
+        securityRoomHandler,
 //        setCharacterClassHandler,
         setCharacterHandler,
 //        showStatusHandler,
