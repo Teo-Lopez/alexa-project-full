@@ -159,14 +159,44 @@
                     ],
                     "samples": [
                         "cojo las {item}",
-                        "voy a las {item}",
-                        "bajo las {item}",
                         "echo un vistazo a los {item}",
                         "miro los {item}",
                         "coger los {item}",
                         "cojo los {item}",
                         "coger el {item}",
                         "cojo el {item}"
+                    ]
+                },
+                {
+                    "name": "toiletIntent",
+                    "slots": [
+                        {
+                            "name": "toiletAction",
+                            "type": "ToiletAction"
+                        }
+                    ],
+                    "samples": [
+                        "elijo {toiletAction}",
+                        "entro al {toiletAction}",
+                        "robo la {toiletAction}",
+                        "cojo la {toiletAction}"
+                    ]
+                },
+                {
+                    "name": "directioningIntent",
+                    "slots": [
+                        {
+                            "name": "place",
+                            "type": "Place"
+                        }
+                    ],
+                    "samples": [
+                        "vuelvo a la {place}",
+                        "voy a la {place}",
+                        "vuelvo a los {place}",
+                        "voy a los {place}",
+                        "vuelvo al {place}",
+                        "voy al {place}"
                     ]
                 }
             ],
@@ -395,6 +425,97 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "Toilet",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "baño",
+                                "synonyms": [
+                                    "lavabo",
+                                    "aseo",
+                                    "servicios",
+                                    "servicio",
+                                    "aseos",
+                                    "toilet"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Cubicle",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "cubículo"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "ToiletAction",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "retrete"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "esperar",
+                                "synonyms": [
+                                    "espero"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "cara"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "tarjeta",
+                                "synonyms": [
+                                    "identificación",
+                                    "tarjeta de seguridad"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Place",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "toilet",
+                                "synonyms": [
+                                    "aseos",
+                                    "servicios",
+                                    "baños",
+                                    "meadero",
+                                    "servicio",
+                                    "aseo"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "cubicle",
+                                "synonyms": [
+                                    "mi cubículo",
+                                    "cubículo",
+                                    "mi cubiculo",
+                                    "mi oficina",
+                                    "oficina",
+                                    "cubiculo"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -402,6 +523,7 @@
             "intents": [
                 {
                     "name": "setNameIntent",
+                    "delegationStrategy": "ALWAYS",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": [
@@ -419,7 +541,6 @@
                 },
                 {
                     "name": "setCharacterIntent",
-                    "delegationStrategy": "ALWAYS",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": [

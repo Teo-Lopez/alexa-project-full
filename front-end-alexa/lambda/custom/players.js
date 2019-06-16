@@ -6,12 +6,21 @@ class Player{
   constructor() {
       this.nombre= "",
       this.stage= 0,
-      this.location= "cubiculo"
+      this.ubication= "cubiculo"
+      this.lastIntent ="introIntent"
+      this.inventory= {phone: false, card: false}
       this.character= {
           nombre: ""
       }
-      this.inventario= {}
   }
 }
-  
+
+/*
+const TheDoctor = {             //Not a class, cause there's only one
+    inventory: [screwdriver, tardis],
+    companions: {
+        
+    }
+}
+  */
 module.exports = Player
