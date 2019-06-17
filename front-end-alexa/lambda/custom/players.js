@@ -8,7 +8,8 @@ class Player{
       this.stage= 0,
       this.ubication= "cubiculo"
       this.lastIntent ="introIntent"
-      this.inventory= {phone: false, card: false}
+      this.inventory= {phone: false, card: false, gun: false}
+      this.chosings= []
       this.character= {
           nombre: ""
       }

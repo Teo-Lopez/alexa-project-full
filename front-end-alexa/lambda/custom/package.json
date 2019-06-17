@@ -191,6 +191,10 @@
                         }
                     ],
                     "samples": [
+                        "uso las {place}",
+                        "bajo al {place}",
+                        "bajo a la {place}",
+                        "bajo por las {place}",
                         "me dirijo a el {place}",
                         "me dirijo a la {place}",
                         "me dirijo a los {place}",
@@ -208,6 +212,23 @@
                 },
                 {
                     "name": "securityRoomIntent",
+                    "slots": [
+                        {
+                            "name": "secRoomAction",
+                            "type": "secRoomAction"
+                        }
+                    ],
+                    "samples": [
+                        "cojo la {secRoomAction}",
+                        "cojo el {secRoomAction}",
+                        "desbloqueo la {secRoomAction}",
+                        "desactivo la {secRoomAction}",
+                        "elimino las {secRoomAction}",
+                        "desactivo las {secRoomAction}"
+                    ]
+                },
+                {
+                    "name": "firstFloorIntent",
                     "slots": [],
                     "samples": []
                 }
@@ -503,6 +524,15 @@
                     "values": [
                         {
                             "name": {
+                                "value": "escaleras",
+                                "synonyms": [
+                                    "primera planta",
+                                    "primer piso"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "sala de seguridad",
                                 "synonyms": [
                                     "sala de camaras",
@@ -533,6 +563,29 @@
                                     "mi oficina",
                                     "oficina",
                                     "cubiculo"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "secRoomAction",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "pistola",
+                                "synonyms": [
+                                    "pipa",
+                                    "arma"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "cámaras",
+                                "synonyms": [
+                                    "seguridad",
+                                    "vigilancia"
                                 ]
                             }
                         }

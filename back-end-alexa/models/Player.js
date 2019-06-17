@@ -6,7 +6,8 @@ const playerSchema = new Schema({
     stage: Number,
     lastIntent: String,
     ubication: String,
-    inventario: {phone: false},
+    inventory: {phone: false, card: false, gun: false},
+    chosings: [],
     character: {
       nombre: String
     }
