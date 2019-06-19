@@ -80,32 +80,9 @@
                     ]
                 },
                 {
-                    "name": "setCharacterClassIntent",
-                    "slots": [
-                        {
-                            "name": "clase",
-                            "type": "Clase",
-                            "samples": [
-                                "va a ser un {clase}",
-                                "será un {clase}",
-                                "{clase}",
-                                "es un {clase}"
-                            ]
-                        }
-                    ],
-                    "samples": [
-                        "un {clase}",
-                        "el {clase}",
-                        "prefiero un {clase}",
-                        "prefiero {clase}",
-                        "un {clase} suena bien",
-                        "quiero jugar con un {clase}",
-                        "quiero un {clase}",
-                        "quiero que sea un {clase}",
-                        "va a ser un {clase}",
-                        "es un {clase}",
-                        "{clase}"
-                    ]
+                    "name": "welcomeIntent",
+                    "slots": [],
+                    "samples": []
                 },
                 {
                     "name": "showStatusIntent",
@@ -158,6 +135,8 @@
                         }
                     ],
                     "samples": [
+                        "coger {item}",
+                        "coger la {item}",
                         "cojo las {item}",
                         "echo un vistazo a los {item}",
                         "miro los {item}",
@@ -176,6 +155,10 @@
                         }
                     ],
                     "samples": [
+                        "me escondo en el {toiletAction}",
+                        "me escondo en un {toiletAction}",
+                        "coger la {toiletAction}",
+                        "coger {toiletAction}",
                         "elijo {toiletAction}",
                         "entro al {toiletAction}",
                         "robo la {toiletAction}",
@@ -191,6 +174,11 @@
                         }
                     ],
                     "samples": [
+                        "salir de {place}",
+                        "salir del {place}",
+                        "ir a la {place}",
+                        "ir al {place}",
+                        "ir a {place}",
                         "uso las {place}",
                         "bajo al {place}",
                         "bajo a la {place}",
@@ -219,6 +207,9 @@
                         }
                     ],
                     "samples": [
+                        "desbloquear las {secRoomAction}",
+                        "desactivar las {secRoomAction}",
+                        "coger la {secRoomAction}",
                         "cojo la {secRoomAction}",
                         "cojo el {secRoomAction}",
                         "desbloqueo la {secRoomAction}",
@@ -231,6 +222,50 @@
                     "name": "firstFloorIntent",
                     "slots": [],
                     "samples": []
+                },
+                {
+                    "name": "basementIntent",
+                    "slots": [
+                        {
+                            "name": "basementAction",
+                            "type": "basementAction"
+                        }
+                    ],
+                    "samples": [
+                        "meter un tiro a {basementAction}",
+                        "disparar a {basementAction}",
+                        "uso la pistola y le {basementAction}",
+                        "uso el arma y le {basementAction}",
+                        "le {basementAction} con la pistola",
+                        "saco la pistola y le {basementAction}",
+                        "le {basementAction}",
+                        "{basementAction} al guardia",
+                        "{basementAction} al guarda"
+                    ]
+                },
+                {
+                    "name": "exitIntent",
+                    "slots": [],
+                    "samples": [
+                        "huyo",
+                        "escapo",
+                        "salgo del banco"
+                    ]
+                },
+                {
+                    "name": "vaultIntent",
+                    "slots": [
+                        {
+                            "name": "vaultAction",
+                            "type": "vaultAction"
+                        }
+                    ],
+                    "samples": [
+                        "{vaultAction} todo",
+                        "{vaultAction} las joyas",
+                        "{vaultAction} el dinero",
+                        "{vaultAction} el oro"
+                    ]
                 }
             ],
             "types": [
@@ -464,6 +499,31 @@
                     "values": [
                         {
                             "name": {
+                                "value": "aseos"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "toilet"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "servicio"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "baños"
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "aseo"
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "baño",
                                 "synonyms": [
                                     "lavabo",
@@ -524,6 +584,30 @@
                     "values": [
                         {
                             "name": {
+                                "value": "cámara acorazada",
+                                "synonyms": [
+                                    "cámara"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "salgo de banco",
+                                "synonyms": [
+                                    "salir del banco"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
+                                "value": "sotano",
+                                "synonyms": [
+                                    "subsotano"
+                                ]
+                            }
+                        },
+                        {
+                            "name": {
                                 "value": "escaleras",
                                 "synonyms": [
                                     "primera planta",
@@ -542,8 +626,9 @@
                         },
                         {
                             "name": {
-                                "value": "toilet",
+                                "value": "baño",
                                 "synonyms": [
+                                    "toilet",
                                     "aseos",
                                     "servicios",
                                     "baños",
@@ -590,6 +675,34 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "basementAction",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "disparo",
+                                "synonyms": [
+                                    "meto un tiro",
+                                    "pego un tiro"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "vaultAction",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "robo",
+                                "synonyms": [
+                                    "cojo",
+                                    "me llevo"
+                                ]
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -621,31 +734,20 @@
                         {
                             "name": "nombrePersonaje",
                             "type": "Nombre",
-                            "confirmationRequired": true,
+                            "confirmationRequired": false,
                             "elicitationRequired": true,
                             "prompts": {
-                                "confirmation": "Confirm.Slot.1162634589919.371631879785",
                                 "elicitation": "Elicit.Slot.725205396923.173009633395"
                             }
                         }
                     ]
                 },
                 {
-                    "name": "setCharacterClassIntent",
+                    "name": "welcomeIntent",
                     "delegationStrategy": "ALWAYS",
                     "confirmationRequired": false,
                     "prompts": {},
-                    "slots": [
-                        {
-                            "name": "clase",
-                            "type": "Clase",
-                            "confirmationRequired": false,
-                            "elicitationRequired": true,
-                            "prompts": {
-                                "elicitation": "Elicit.Slot.676980488811.350283888798"
-                            }
-                        }
-                    ]
+                    "slots": []
                 }
             ],
             "delegationStrategy": "ALWAYS"
@@ -753,7 +855,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "¿cual es el nombre del personaje?"
+                        "value": "¿Cómo se llamará?"
                     }
                 ]
             },
